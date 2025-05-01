@@ -485,11 +485,17 @@ def create_tables_and_admin():
             
             # Create default categories
             categories = [
-                Category(name='General', description='General documents'),
-                Category(name='Reports', description='Report documents'),
-                Category(name='Finance', description='Financial documents'),
-                Category(name='HR', description='Human Resources documents'),
-                Category(name='Legal', description='Legal documents')
+                Category(name='Administrative Documents', description='Internal office communications and general operations'),
+                Category(name='Personnel Records', description='HR and employee-specific documentation'),
+                Category(name='Finance Records', description='Budget, accounting, and fund tracking'),
+                Category(name='Project & Program Files', description='Implementation of local government programs and services'),
+                Category(name='Legal & Compliance', description='Regulatory, legal, and audit-related documents'),
+                Category(name='Barangay Communications', description='Correspondence and reports from barangays under the LGU'),
+                Category(name='Public Services', description='Delivery of community services to residents'),
+                Category(name='Planning & Development', description='Strategic, demographic, and land-use planning'),
+                Category(name='Citizen Records', description='Files directly involving individuals or groups from the public'),
+                Category(name='Environmental Documents', description='Files related to ecological compliance and initiatives'),
+                Category(name='Others', description='Other documents')
             ]
             
             for category in categories:
