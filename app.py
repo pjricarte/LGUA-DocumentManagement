@@ -157,15 +157,25 @@ def dashboard():
         query = query.filter(File.category_id == category_filter)
     
     # Apply date filter
+    import datetime
     if date_filter:
+        current_date = datetime.datetime.now()
         if date_filter == 'today':
-            query = query.filter(db.func.date(File.upload_date) == db.func.date(db.func.now()))
+            # Today's date filter
+            today = datetime.datetime.now().date()
+            query = query.filter(db.func.date(File.upload_date) == today)
         elif date_filter == 'this_week':
-            query = query.filter(db.func.date(File.upload_date) >= db.func.date_sub(db.func.now(), 7))
+            # This week is the last 7 days
+            week_ago = current_date - datetime.timedelta(days=7)
+            query = query.filter(File.upload_date >= week_ago)
         elif date_filter == 'this_month':
-            query = query.filter(db.func.month(File.upload_date) == db.func.month(db.func.now()))
+            # This month filter
+            start_of_month = datetime.datetime(current_date.year, current_date.month, 1)
+            query = query.filter(File.upload_date >= start_of_month)
         elif date_filter == 'this_year':
-            query = query.filter(db.func.year(File.upload_date) == db.func.year(db.func.now()))
+            # This year filter
+            start_of_year = datetime.datetime(current_date.year, 1, 1)
+            query = query.filter(File.upload_date >= start_of_year)
     
     # Apply sorting
     if sort_by == 'date_asc':
