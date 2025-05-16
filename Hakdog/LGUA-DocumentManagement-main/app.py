@@ -215,10 +215,10 @@ def dashboard():
 @app.route('/search', methods=['GET'])
 @login_required
 def search_page():
-    search_query = request.args.get('search', '')
+    search_query = request.args.get('search_query', '')
     category_filter = request.args.get('category', '')
     date_filter = request.args.get('date', '')
-    sort_by = request.args.get('sort', 'date_desc')
+    sort_by = request.args.get('sort_by', 'date_desc')  # Fix this too
 
     # Base query
     if current_user.role == user_roles['ADMIN']:
@@ -226,7 +226,7 @@ def search_page():
     else:
         query = File.query.filter_by(user_id=current_user.id)
 
-    # Apply search filter
+    # Search filter
     if search_query:
         query = query.filter(or_(
             File.filename.contains(search_query),
@@ -234,52 +234,53 @@ def search_page():
             File.description.contains(search_query)
         ))
 
-    # Apply category filter
-    if category_filter and category_filter != 'all':
-        query = query.filter(File.category_id == category_filter)
+    # Category filter
+    if category_filter:
+        query = query.join(Category).filter(Category.name == category_filter)
 
-    # Apply date filter
+    # Date filter
     import datetime
     current_date = datetime.datetime.now()
-    if date_filter:
-        if date_filter == 'today':
-            today = datetime.datetime.now().date()
-            query = query.filter(db.func.date(File.upload_date) == today)
-        elif date_filter == 'this_week':
-            week_ago = current_date - datetime.timedelta(days=7)
-            query = query.filter(File.upload_date >= week_ago)
-        elif date_filter == 'this_month':
-            start_of_month = datetime.datetime(current_date.year, current_date.month, 1)
-            query = query.filter(File.upload_date >= start_of_month)
-        elif date_filter == 'this_year':
-            start_of_year = datetime.datetime(current_date.year, 1, 1)
-            query = query.filter(File.upload_date >= start_of_year)
+    if date_filter == 'this_week':
+        week_ago = current_date - datetime.timedelta(days=7)
+        query = query.filter(File.upload_date >= week_ago)
+    elif date_filter == 'this_month':
+        start_of_month = datetime.datetime(current_date.year, current_date.month, 1)
+        query = query.filter(File.upload_date >= start_of_month)
 
-    # Apply sorting
-    if sort_by == 'date_asc':
-        query = query.order_by(File.upload_date.asc())
-    elif sort_by == 'date_desc':
+    # Sorting
+    if sort_by == 'newest':
         query = query.order_by(File.upload_date.desc())
+    elif sort_by == 'oldest':
+        query = query.order_by(File.upload_date.asc())
     elif sort_by == 'name_asc':
         query = query.order_by(File.filename.asc())
     elif sort_by == 'name_desc':
         query = query.order_by(File.filename.desc())
-    elif sort_by == 'size_asc':
-        query = query.order_by(File.file_size.asc())
-    elif sort_by == 'size_desc':
-        query = query.order_by(File.file_size.desc())
 
-    files = query.all()
+    results = query.all()
+    categories = [c.name for c in Category.query.all()]
 
-    categories = Category.query.all()
-
-    return render_template('search.html', 
-                           files=files,
+    return render_template('search.html',
+                           results=results,
                            categories=categories,
+                           selected_category=category_filter,
                            current_search=search_query,
-                           current_category=category_filter,
                            current_date=date_filter,
                            current_sort=sort_by)
+
+@app.template_filter('human_readable')
+def human_readable_size(size):
+    try:
+        size = float(size)
+    except (TypeError, ValueError):
+        return "0 B"
+
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024.0:
+            return f"{size:.2f} {unit}"
+        size /= 1024.0
+    return f"{size:.2f} PB"
 
 
 @app.route('/upload', methods=['POST'])
