@@ -1,0 +1,244 @@
+/* LOGIN PAGE */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: row;
+}
+
+.login-right-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 5%;
+}
+
+.login-form-container {
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #2b2b2b;
+  font-family: 'Poppins', sans-serif;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Placeholder styling */
+::placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #aaa;
+  opacity: 1;
+}
+
+.forgot {
+  display: block;
+  text-align: right;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #1E88E5;
+  text-decoration: none;
+}
+
+.signin-btn {
+  width: 100%;
+  background-color: #1E88E5;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.delete-btn {
+  width: 100%;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.signup-text {
+  font-size: 12px;
+  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.signup-text a {
+  color: #1E88E5;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-error {
+  color: #e74c3c;
+  background: #fff;
+  border: none;
+  font-size: 14px;
+  margin-bottom: 10px;
+  margin-top: 5px;
+  text-align: center;
+  width: 100%;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.register-btn {
+  width: 100%;
+  background-color: #33B084;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+/* SIGNUP PAGE */
+.register-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: row;
+}
+
+.register-right-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 5%;
+  background-color: #fff;
+}
+
+.register-form-container {
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.register-form-container h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #2b2b2b;
+}
+
+.register-form-container input[type="text"],
+.register-form-container input[type="email"],
+.register-form-container input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.register-form-container small {
+  font-size: 12px;
+  color: #555;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.create-account-btn {
+  width: 100%;
+  background-color: #1E88E5;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.create-account-btn:hover {
+  background-color: #1C86EE;
+}
+
+/* SHARED LEFT PANEL */
+.left-panel img {
+  width: 600px;
+  height: 100vh;
+  object-fit: cover;
+  display: block;
+}
+
+/* Additional styles for proper display */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 50%;
+  overflow: hidden;
+}
+
+/* Flash messages */
+.alert {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}

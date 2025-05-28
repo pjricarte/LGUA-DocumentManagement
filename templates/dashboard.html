@@ -1,81 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - LGU Alubijid File Management System{% endblock %}
+{% block page_title %}Home{% endblock %}
 
-{% block content %}
-<div class="dashboard-container">
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <button class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="Logo" height="40">
-        </div>
-        <ul class="sidebar-menu">
-            <li>
-                <a href="{{ url_for('dashboard') }}" class="active">
-                    <i class="fas fa-home menu-icon"></i>
-                    <span class="menu-text">Home</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('dashboard') }}">
-                    <i class="fas fa-search menu-icon"></i>
-                    <span class="menu-text">Search</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('account') }}">
-                    <i class="fas fa-user menu-icon"></i>
-                    <span class="menu-text">My Account</span>
-                </a>
-            </li>
-            {% if current_user.is_admin %}
-            <li>
-                <a href="{{ url_for('admin_categories') }}">
-                    <i class="fas fa-tags menu-icon"></i>
-                    <span class="menu-text">Categories</span>
-                </a>
-            </li>
-            {% endif %}
-            <li>
-                <a href="{{ url_for('logout') }}">
-                    <i class="fas fa-sign-out-alt menu-icon"></i>
-                    <span class="menu-text">Logout</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    
-    <div class="main-content">
-        <div class="navbar">
-            <div class="d-flex align-items-center">
-                <h4 class="mb-0">Dashboard</h4>
-            </div>
-            
-            <form id="search-form" class="navbar-search">
-                <input type="text" id="search-input" name="search" placeholder="Search files..." value="{{ current_search }}">
-                <button type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-            
-            <div class="navbar-user">
-                <div class="user-icon">
-                    {{ current_user.username[0].upper() }}
-                </div>
-                <span>{{ current_user.username }}</span>
-            </div>
-        </div>
-        
-        <div class="content">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+
+{% block dashboard_content %}
             
             <div class="card">
                 <div class="card-header">
@@ -83,40 +11,40 @@
                 </div>
                 <div class="card-body">
                     <form id="upload-form" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
-                        <div class="upload-area" id="upload-area">
-                            <p>Drag and drop file here or</p>
-                            <button type="button" class="upload-btn">Choose file</button>
-                            <input type="file" id="file-input" name="file" style="display: none;">
-                            <p class="file-name text-muted mt-3">No file selected</p>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="file" class="form-label">Select File</label>
+                                    <input type="file" class="form-control" id="file" name="file" required>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="upload-form-fields d-none">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="title">Title</label>
-                                        <input type="text" class="form-control" id="title" name="title" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="category_id">Category</label>
-                                        <select class="form-control" id="category_id" name="category_id">
-                                            <option value="">-- Select Category --</option>
-                                            {% for category in categories %}
-                                            <option value="{{ category.id }}">{{ category.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
                                 </div>
                             </div>
-                            <div class="form-group mt-3">
-                                <label for="description">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="category_id" class="form-label">Category</label>
+                                    <select class="form-control form-select" id="category_id" name="category_id">
+                                        <option value="">-- Select Category --</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
-                            <div class="text-right mt-3">
-                                <button type="submit" class="btn btn-primary">Upload File</button>
-                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Upload File</button>
                         </div>
                     </form>
                 </div>
@@ -145,63 +73,57 @@
                                 <option value="this_year" {% if current_date == 'this_year' %}selected{% endif %}>This Year</option>
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <label for="sort-by">Sort By:</label>
-                            <select id="sort-by" class="form-control">
-                                <option value="date_desc" {% if current_sort == 'date_desc' %}selected{% endif %}>Date (Newest First)</option>
-                                <option value="date_asc" {% if current_sort == 'date_asc' %}selected{% endif %}>Date (Oldest First)</option>
-                                <option value="name_asc" {% if current_sort == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
-                                <option value="name_desc" {% if current_sort == 'name_desc' %}selected{% endif %}>Name (Z-A)</option>
-                                <option value="size_asc" {% if current_sort == 'size_asc' %}selected{% endif %}>Size (Smallest First)</option>
-                                <option value="size_desc" {% if current_sort == 'size_desc' %}selected{% endif %}>Size (Largest First)</option>
-                            </select>
-                        </div>
+
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-hover" id="filesTable">
                             <thead>
                                 <tr>
-                                    <th width="30"><input type="checkbox" id="select-all"></th>
                                     <th>Name</th>
                                     <th>File Type</th>
                                     <th>Size</th>
                                     <th>Category</th>
                                     <th>Uploaded By</th>
                                     <th>Date Uploaded</th>
-                                    <th width="100">Actions</th>
+                                    <th width="120">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if files %}
                                     {% for file in files %}
                                     <tr>
-                                        <td><input type="checkbox" class="file-select" data-id="{{ file.id }}"></td>
                                         <td>{{ file.filename }}</td>
                                         <td>{{ file.file_type|upper }}</td>
                                         <td>{{ file.file_size_formatted }}</td>
                                         <td>
                                             {% if file.category %}
-                                            <span class="category-badge category-{{ file.category.name|lower|replace(' ', '-') }}">
+                                            <span class="category-chip" style="background-color: {{ get_category_color(file.category.name) }}">
                                                 {{ file.category.name }}
                                             </span>
                                             {% else %}
-                                            <span class="category-badge category-other">Uncategorized</span>
+                                            <span class="category-chip" style="background-color: #aaaaaa">
+                                                Uncategorized
+                                            </span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ file.user.username }}</td>
+                                        <td>{{ file.uploader_username }}</td>
                                         <td>{{ file.upload_date.strftime('%m/%d/%Y') }}</td>
-                                        <td>
-                                            <a href="{{ url_for('download_file', file_id=file.id) }}" class="action-btn download-btn" title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                            <a href="{{ url_for('edit_file', file_id=file.id) }}" class="action-btn edit-btn" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="action-btn delete-btn" data-id="{{ file.id }}" data-name="{{ file.filename }}" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                        <td class="action-buttons">
+                                            <div class="btn-group">
+                                                <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-sm btn-outline-primary" title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <a href="{{ url_for('edit_file', file_id=file.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="{{ url_for('delete_file', file_id=file.id) }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this file?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -219,7 +141,7 @@
                         <ul class="pagination">
                             {% if pagination.has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('dashboard', page=pagination.prev_num, search=current_search, category=current_category, date=current_date, sort=current_sort) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('dashboard', page=pagination.prev_num, search=current_search, category=current_category, date=current_date, sort=current_sort, direction=sort_direction) }}">Previous</a>
                             </li>
                             {% else %}
                             <li class="page-item disabled">
@@ -231,7 +153,7 @@
                                 {% if page_num %}
                                     {% if page_num != pagination.page %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{{ url_for('dashboard', page=page_num, search=current_search, category=current_category, date=current_date, sort=current_sort) }}">{{ page_num }}</a>
+                                        <a class="page-link" href="{{ url_for('dashboard', page=page_num, search=current_search, category=current_category, date=current_date, sort=current_sort, direction=sort_direction) }}">{{ page_num }}</a>
                                     </li>
                                     {% else %}
                                     <li class="page-item active">
@@ -247,7 +169,7 @@
                             
                             {% if pagination.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('dashboard', page=pagination.next_num, search=current_search, category=current_category, date=current_date, sort=current_sort) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('dashboard', page=pagination.next_num, search=current_search, category=current_category, date=current_date, sort=current_sort, direction=sort_direction) }}">Next</a>
                             </li>
                             {% else %}
                             <li class="page-item disabled">
@@ -262,4 +184,68 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+<!-- Delete File functionality now uses direct links with onclick confirmation -->
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const categoryFilter = document.getElementById('category-filter');
+        const dateFilter = document.getElementById('date-filter');
+        
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', function() {
+                applyFilters();
+            });
+        }
+        
+        if (dateFilter) {
+            dateFilter.addEventListener('change', function() {
+                applyFilters();
+            });
+        }
+        
+        function applyFilters() {
+            const categoryValue = categoryFilter.value;
+            const dateValue = dateFilter.value;
+            
+            let url = '{{ url_for("dashboard") }}';
+            let params = [];
+            
+            if (categoryValue && categoryValue !== 'all') {
+                params.push('category=' + categoryValue);
+            }
+            
+            if (dateValue) {
+                params.push('date=' + dateValue);
+            }
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            window.location.href = url;
+        }
+        
+        // File upload functionality
+        const fileInput = document.getElementById('file');
+        const titleInput = document.getElementById('title');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    
+                    // Auto-fill title with filename (without extension)
+                    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                    if (!titleInput.value) {
+                        titleInput.value = fileNameWithoutExt || file.name;
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

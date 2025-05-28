@@ -1,64 +1,38 @@
-{% extends "base.html" %} {% block title %}Login - LGU Alubijid File Management
-System{% endblock %} {% block content %}
-<div class="auth-container">
-  <div
-    class="auth-bg"
-    style="
-      background-image: url('https://images.unsplash.com/photo-1542281286-9e0a16bb7366?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-    "
-  ></div>
-  <div class="auth-form-container">
-    <div class="auth-form">
-      <div style="text-align: center; margin-bottom: 20px">
-        <img
-          src="{{ url_for('static', filename='assets/logo.png') }}"
-          alt="LGU Logo"
-          style="width: 120px"
-        />
-      </div>
-      <h2>Log in to LGU Alubijid File Management System</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="login-container">
+    <div class="left-panel">
+      <img src="{{ url_for('static', filename='assets/stockimage.jpg') }}"/>
+    </div>
 
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% endwith %}
-
-      <form method="POST" action="{{ url_for('login') }}">
-        <div class="form-group">
-          <label for="username">Username or Email</label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            required
-          />
-        </div>
-        <div class="text-right mb-3">
-          <a href="{{ url_for('login') }}?forgot=true" class="text-muted"
-            >Forgot your password?</a
-          >
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-      </form>
-
-      <div class="auth-links">
-        <p>
-          Don't have an account?
-          <a href="{{ url_for('register') }}">Sign up here.</a>
-        </p>
+    <div class="login-right-panel">
+      <div class="login-form-container">
+        <h2>Log in to LGU Alubijid File<br>Management System</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <form method="post" action="{{ url_for('login') }}">
+          <input type="text" name="username" placeholder="Username or Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit" class="signin-btn">Sign in</button>
+          <p class="signup-text">Don't have an account? <a href="{{ url_for('register') }}">Sign up</a></p>
+        </form>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+</body>
+</html>

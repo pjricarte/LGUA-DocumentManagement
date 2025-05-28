@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Search - Document Management System{% endblock %}
+
+{% block page_title %}Search{% endblock %}
+
+{% block dashboard_content %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Advanced Search</h5>
+                </div>
+                <div class="card-body">
+                    <form id="search-form" action="{{ url_for('search') }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label for="search-query">Search Query</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="search-query" name="query" placeholder="Enter keywords..." value="{{ request.args.get('query', '') }}">
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search me-2"></i>Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <select class="form-control" id="category" name="category">
+                                        <option value="">All Categories</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if request.args.get('category') == category.id|string %}selected{% endif %}>{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="date-range">Date Range</label>
+                                    <select class="form-control" id="date-range" name="date">
+                                        <option value="" {% if not request.args.get('date') %}selected{% endif %}>All Time</option>
+                                        <option value="today" {% if request.args.get('date') == 'today' %}selected{% endif %}>Today</option>
+                                        <option value="this_week" {% if request.args.get('date') == 'this_week' %}selected{% endif %}>This Week</option>
+                                        <option value="this_month" {% if request.args.get('date') == 'this_month' %}selected{% endif %}>This Month</option>
+                                        <option value="this_year" {% if request.args.get('date') == 'this_year' %}selected{% endif %}>This Year</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="sort-by">Sort By</label>
+                                    <select class="form-control" id="sort-by" name="sort">
+                                        <option value="date_desc" {% if request.args.get('sort') == 'date_desc' %}selected{% endif %}>Date (Newest First)</option>
+                                        <option value="date_asc" {% if request.args.get('sort') == 'date_asc' %}selected{% endif %}>Date (Oldest First)</option>
+                                        <option value="name_asc" {% if request.args.get('sort') == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
+                                        <option value="name_desc" {% if request.args.get('sort') == 'name_desc' %}selected{% endif %}>Name (Z-A)</option>
+                                        <option value="size_asc" {% if request.args.get('sort') == 'size_asc' %}selected{% endif %}>Size (Smallest First)</option>
+                                        <option value="size_desc" {% if request.args.get('sort') == 'size_desc' %}selected{% endif %}>Size (Largest First)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Search Results</h5>
+                    <span class="badge bg-primary rounded-pill">{{ files|length }} results</span>
+                </div>
+                <div class="card-body">
+                    {% if files %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="searchResultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>File Type</th>
+                                    <th>Size</th>
+                                    <th>Category</th>
+                                    <th>Uploaded By</th>
+                                    <th>Date Uploaded</th>
+                                    <th width="120">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for file in files %}
+                                <tr>
+                                    <td>{{ file.filename }}</td>
+                                    <td>{{ file.file_type|upper }}</td>
+                                    <td>{{ file.file_size_formatted }}</td>
+                                    <td>
+                                        {% if file.category %}
+                                        <span class="category-chip" style="background-color: {{ get_category_color(file.category.name) }}">
+                                            {{ file.category.name }}
+                                        </span>
+                                        {% else %}
+                                        <span class="category-chip" style="background-color: #aaaaaa">
+                                            Uncategorized
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ file.uploader_username }}</td>
+                                    <td>{{ file.upload_date.strftime('%m/%d/%Y') }}</td>
+                                    <td class="action-buttons">
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-sm btn-outline-primary" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <a href="{{ url_for('edit_file', file_id=file.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ url_for('delete_file', file_id=file.id) }}" method="POST" style="display:inline;">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this file?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if pagination and pagination.pages > 1 %}
+                    <div class="pagination-container mt-4">
+                        <div class="pagination-info">
+                            Showing {{ pagination.items|length }} of {{ pagination.total }} results
+                        </div>
+                        <nav aria-label="Search results navigation">
+                            <ul class="pagination">
+                                {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('search', page=pagination.prev_num, query=request.args.get('query', ''), category=request.args.get('category', ''), date=request.args.get('date', ''), sort=request.args.get('sort', 'date_desc')) }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for page in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                    {% if page %}
+                                        {% if page == pagination.page %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ page }}</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('search', page=page, query=request.args.get('query', ''), category=request.args.get('category', ''), date=request.args.get('date', ''), sort=request.args.get('sort', 'date_desc')) }}">{{ page }}</a>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#">...</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('search', page=pagination.next_num, query=request.args.get('query', ''), category=request.args.get('category', ''), date=request.args.get('date', ''), sort=request.args.get('sort', 'date_desc')) }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-search fa-3x text-muted"></i>
+                        </div>
+                        <h4>No results found</h4>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Delete File Modal -->
+<div class="modal fade" id="deleteFileModal" tabindex="-1" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteFileModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the file <strong id="delete-file-name"></strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="delete-file-form" action="" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        // Delete file modal functionality
+        const deleteFileModal = document.getElementById('deleteFileModal');
+        const deleteFileForm = document.getElementById('delete-file-form');
+        const deleteFileName = document.getElementById('delete-file-name');
+        const deleteButtons = document.querySelectorAll('.delete-file-btn');
+        
+        if (deleteButtons.length > 0) {
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const fileId = this.getAttribute('data-id');
+                    const fileName = this.getAttribute('data-name');
+                    
+                    deleteFileName.textContent = fileName;
+                    deleteFileForm.action = '/delete/' + fileId;
+                });
+            });
+        }
+        const mainContent = document.getElementById('main-content');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        if (mobileSidebarToggle) {
+            mobileSidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        const alertCloseButtons = document.querySelectorAll('.alert-close');
+        alertCloseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const alert = this.closest('.alert');
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -3,22 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LGU Alubijid File Management System{% endblock %}</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Document Management System">
+    <meta name="theme-color" content="#007bff">
+    <title>{% block title %}Document Management System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     {% block content %}{% endblock %}
+
+{% block dashboard_layout %}
+<div class="dashboard-container">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('search') }}" {% if request.endpoint == 'search' %}class="active"{% endif %}>
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('account') }}" {% if request.endpoint == 'account' %}class="active"{% endif %}>
+                    <i class="fas fa-user menu-icon"></i>
+                    <span class="menu-text">My Account</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('manage_categories') }}" {% if request.endpoint == 'manage_categories' %}class="active"{% endif %}>
+                    <i class="fas fa-tags menu-icon"></i>
+                    <span class="menu-text">Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('recycle_bin') }}" {% if request.endpoint == 'recycle_bin' %}class="active"{% endif %}>
+                    <i class="fas fa-trash-alt menu-icon"></i>
+                    <span class="menu-text">Recycle Bin</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt menu-icon"></i>
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <div class="main-content" id="main-content">
+        <div class="navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-sidebar-toggle d-lg-none me-2" type="button" id="mobile-sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0">{% block page_title %}{% endblock %}</h4>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                {% block navbar_actions %}{% endblock %}
+                
+                <div class="navbar-user">
+                    <div class="user-icon">
+                        {{ current_user.username[0].upper() if current_user.is_authenticated else 'G' }}
+                    </div>
+                    <span>{{ current_user.username if current_user.is_authenticated else 'Guest' }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                            <button type="button" class="alert-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block dashboard_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block auth_layout %}{% endblock %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            function toggleSidebar() {
+                if (sidebar) {
+                    sidebar.classList.toggle('show');
+                    sidebar.classList.toggle('collapsed');
+                }
+                
+                if (mainContent) {
+                    mainContent.classList.toggle('expanded');
+                }
+            }
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            const alertCloseButtons = document.querySelectorAll('.alert-close');
+            alertCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alert = this.closest('.alert');
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                });
+            });
+            
+            // Handle responsive behavior
+            function handleResponsive() {
+                if (window.innerWidth < 992) {
+                    if (sidebar && !sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.add('collapsed');
+                    }
+                    if (mainContent && !mainContent.classList.contains('expanded')) {
+                        mainContent.classList.add('expanded');
+                    }
+                }
+            }
+            
+            // Initial check
+            handleResponsive();
+            
+            // Listen for window resize
+            window.addEventListener('resize', handleResponsive);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

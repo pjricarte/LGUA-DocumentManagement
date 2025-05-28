@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block page_title %}Recycle Bin{% endblock %}
+
+{% block dashboard_content %}
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recycle Bin</h5>
+                    <p class="text-muted">Files in the recycle bin will be permanently deleted after 15 days</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="filesTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>File Type</th>
+                                    <th>Size</th>
+                                    <th>Category</th>
+                                    <th>Deleted On</th>
+                                    <th>Days Remaining</th>
+                                    <th width="120">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if files %}
+                                    {% for file in files %}
+                                    <tr>
+                                        <td>{{ file.filename }}</td>
+                                        <td>{{ file.file_type|upper }}</td>
+                                        <td>{{ file.file_size_formatted }}</td>
+                                        <td>
+                                            {% if file.category %}
+                                            <span class="category-chip category-{{ file.category.name|lower|replace(' ', '-') }}">
+                                                {{ file.category.name }}
+                                            </span>
+                                            {% else %}
+                                            <span class="category-chip category-uncategorized">
+                                                Uncategorized
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ file.deleted_at.strftime('%m/%d/%Y %H:%M') }}</td>
+                                        <td>
+                                            {% if file.days_remaining == 0 %}
+                                                <span class="badge bg-danger">Expiring today</span>
+                                            {% elif file.days_remaining == 1 %}
+                                                <span class="badge bg-warning">1 day</span>
+                                            {% elif file.days_remaining <= 3 %}
+                                                <span class="badge bg-warning">{{ file.days_remaining }} days</span>
+                                            {% else %}
+                                                <span class="badge bg-info">{{ file.days_remaining }} days</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="action-buttons">
+                                            <div class="btn-group">
+                                                <form action="{{ url_for('restore_file', file_id=file.id) }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Restore">
+                                                        <i class="fas fa-trash-restore"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ url_for('permanent_delete_file', file_id=file.id) }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Permanently" onclick="return confirm('Are you sure you want to permanently delete this file? This action cannot be undone.')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center">Your recycle bin is empty</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if pagination.pages > 1 %}
+                    <nav aria-label="File navigation">
+                        <ul class="pagination">
+                            {% if pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('recycle_bin', page=pagination.prev_num) }}">Previous</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for page_num in pagination.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != pagination.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('recycle_bin', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ page_num }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('recycle_bin', page=pagination.next_num) }}">Next</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
