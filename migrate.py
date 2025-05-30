@@ -24,7 +24,7 @@ def create_admin_user():
                 email='admin@example.com',
                 first_name='Admin',
                 last_name='User',
-                password_hash=generate_password_hash('admin123')
+                password_hash=generate_password_hash('admin123', method='pbkdf2')
             )
             db.session.add(admin)
             db.session.commit()

@@ -15,6 +15,9 @@
 
     <div class="register-right-panel">
       <div class="register-form-container">
+        <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+          <img src="{{ url_for('static', filename='assets/logo1.jpeg') }}" alt="LGU Alubijid Logo" style="max-width: 150px; height: auto;">
+        </div>
         <h2>Create an Account</h2>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
